@@ -71,25 +71,10 @@ def dashboard():
             else:
                 return render_template("qr.html")
         else:
-<<<<<<< HEAD
             return "Invalid Or Not Authorized"
     except:
         ip = request.remote_addr
         return render_template("err.html" , ip=ip)
-=======
-            return render_template("qr.html")
-    elif h["role"] == "Developer":
-        if h['payment_completed'] == True:
-            if h['status'] == "Fail" or h['status'] == "pending....":
-               C =  COURSES.find({"for_which":h["role"]})  
-               return render_template("Dev.html" , email=email , h=h , employee_photo = employee_photo["Employee_Pic"] , c=C)
-            elif h['status'] == "Pass":
-              return render_template("pass.html" , em=employee_photo)
-        else:
-             return render_template("qr.html")
-    else:
-        return "Invalid Or Not Authorized"
->>>>>>> e69349cf75b9cf4bbb0400ee9e2305a1cea2eb66
 
 
 @home.route("/apply-payment-completed/<email_id>" , methods=["POST"])
