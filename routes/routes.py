@@ -58,8 +58,11 @@ def dashboard():
             return render_template("qr.html")
     elif h["role"] == "Developer":
         if h['payment_completed'] == True:
-          C =  COURSES.find({"for_which":h["role"]})  
-          return render_template("Dev.html" , email=email , h=h , employee_photo = employee_photo["Employee_Pic"] , c=C)
+            if h['status'] == "Fail" or h['status'] == "pending....":
+               C =  COURSES.find({"for_which":h["role"]})  
+               return render_template("Dev.html" , email=email , h=h , employee_photo = employee_photo["Employee_Pic"] , c=C)
+            elif h['status'] == "Pass":
+              return render_template("pass.html" , em=employee_photo)
         else:
              return render_template("qr.html")
     else:
