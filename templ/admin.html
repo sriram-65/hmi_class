@@ -126,6 +126,7 @@
         <form action="/set-status" method="POST">
           <input type="hidden" name="email-id" value="{{ i.employee_email }}">
           <select name="passorfail" required>
+            <option selected disabled>Select</option>
             <option value="Pass">Pass</option>
             <option value="Fail">Fail</option>
           </select>

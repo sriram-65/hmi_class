@@ -8,6 +8,9 @@ home = Blueprint("routes" , __name__)
 @home.route("/" , methods=["POST" , "GET"])
 def HomeLogin():
     
+    if session.get("email"):
+        return redirect("/dash")
+    
     if request.method == "POST":  
       phone_no = request.form.get("phone_no")
       
@@ -16,9 +19,8 @@ def HomeLogin():
       if not emp:
           return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Not Found !")
       
-      
-      if hmi:
-          return render_template("index.html" , err=f"Employee with this Email or Phone Number is Already Registerd")
+      if not hmi:
+          return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Already Found Use Different Phone Number !")
       
       data = {
           "employee_email":emp['Employee_email'],
@@ -44,26 +46,35 @@ def HomeLogin():
       
 @home.route("/dash")
 def dashboard():
-    email = session.get("email")
-    h = HMI_CLASS_REG.find_one({"employee_email":email})
-    employee_photo = EMPLOYEE_REGISTER.find_one({"Employee_email":email})
-    if h["role"] == "ClinetEmployee":
-        if h['payment_completed'] == True:
-          if h['status'] == "Fail" or h['status'] == "pending....":
-            C =  COURSES.find({"for_which":h["role"]})
-            return render_template("clientemp.html" , email=email , h=h , employee_photo = employee_photo["Employee_Pic"] , c = C )
-          elif h['status'] == "Pass":
-              return render_template("pass.html" , em=employee_photo)
+    if not session.get("email"):
+        return redirect("/")
+    try:
+        email = session.get("email")
+        h = HMI_CLASS_REG.find_one({"employee_email":email})
+        employee_photo = EMPLOYEE_REGISTER.find_one({"Employee_email":email})
+        if h["role"] == "ClinetEmployee":
+            if h['payment_completed'] == True:
+             if h['status'] == "Fail" or h['status'] == "pending....":
+                C =  COURSES.find({"for_which":h["role"]})
+                return render_template("clientemp.html" , email=email , h=h , employee_photo = employee_photo["Employee_Pic"] , c = C )
+            elif h['status'] == "Pass":
+                return render_template("pass.html" , em=employee_photo)
+            else:
+                return render_template("qr.html")
+        elif h["role"] == "Developer":
+            if h['payment_completed'] == True:
+                if h['status'] == "Fail" or h['status'] == "pending....":
+                    C =  COURSES.find({"for_which":h["role"]})  
+                    return render_template("Dev.html" , email=email , h=h , employee_photo = employee_photo["Employee_Pic"] , c=C)
+                elif h['status'] == "Pass":
+                    return render_template("pass.html" , em=employee_photo)
+            else:
+                return render_template("qr.html")
         else:
-            return render_template("qr.html")
-    elif h["role"] == "Developer":
-        if h['payment_completed'] == True:
-          C =  COURSES.find({"for_which":h["role"]})  
-          return render_template("Dev.html" , email=email , h=h , employee_photo = employee_photo["Employee_Pic"] , c=C)
-        else:
-             return render_template("qr.html")
-    else:
-        return "Invalid Or Not Authorized"
+            return "Invalid Or Not Authorized"
+    except:
+        ip = request.remote_addr
+        return render_template("err.html" , ip=ip)
 
 
 @home.route("/apply-payment-completed/<email_id>" , methods=["POST"])
@@ -76,6 +87,8 @@ def Payment_completed(email_id):
 
 @home.route("/get-data-payment")
 def Get_data():
+    if not session.get("email"):
+        return redirect("/")
     email = session.get("email")
     U = HMI_CLASS_REG.find_one({"employee_email":email})
     if U:
