@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Congratulations!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="confetti-container">
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+    </div>
+    
+    <section class="congrats-card">
+        <div class="card-content">
+            <div class="trophy-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h1>Congratulations <span class="highlight">{{em.Employee_name}}</span>! <i class="fas fa-hands-clapping"></i></h1>
+            <p class="subtitle">You've been selected as HMI's <span class="role">{{em.Employee_Role}}</span></p>
+            
+            <div class="employee-pic-container">
+                <img src="{{em.Employee_Pic}}" class="employee-pic"/>
+                <div class="pic-frame"></div>
+            </div>
+            
+            <p class="welcome-message">We're excited to have you on board and can't wait to see the amazing contributions you'll bring to our team!</p>
+            
+            <button class="cta-button">
+                <a href="hmi-management.vercel.app">Let's Start Your Journey <i class="fas fa-arrow-right"></i></a>
+            </button>
+        </div>
+    </section>
+</body>
+</html>
+
+<style>
+    :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3a0ca3;
+        --accent-color: #f72585;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+    }
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+	background-size: 400% 400%;
+	animation: gradient 15s ease infinite;
+        font-family: 'Poppins', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    @keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+    .confetti-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: var(--accent-color);
+        opacity: 0;
+    }
+    
+    .congrats-card {
+        background: rgba(255, 255, 255, 0.63);
+        border-radius: 20px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        transform-style: preserve-3d;
+        transition: all 0.5s ease;
+    }
+    
+    .congrats-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-content {
+        position: relative;
+    }
+    
+    .trophy-icon {
+        font-size: 60px;
+        color: gold;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        animation: bounce 2s infinite;
+    }
+    
+    h1 {
+        color: var(--dark-color);
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+    
+    .highlight {
+        color: var(--primary-color);
+        text-decoration: underline;
+        text-underline-offset: 5px;
+    }
+    
+    .subtitle {
+        color: #666;
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+    }
+    
+    .role {
+        color: var(--secondary-color);
+        font-weight: 600;
+    }
+    
+    .employee-pic-container {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto 25px;
+        position: relative;
+    }
+    
+    .employee-pic {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 5px solid white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 2;
+    }
+    
+    .pic-frame {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+        z-index: 1;
+        animation: rotate 10s linear infinite;
+    }
+    
+    .welcome-message {
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        font-size: 1rem;
+    }
+    
+    .cta-button {
+        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(67, 97, 238, 0.6);
+    }
+    
+    .cta-button:active {
+        transform: translateY(1px);
+    }
+    
+    .cta-button a {
+        color: white;
+        text-decoration: none;
+    }
+    
+    .fa-arrow-right {
+        margin-left: 8px;
+        transition: transform 0.3s ease;
+    }
+    
+    .cta-button:hover .fa-arrow-right {
+        transform: translateX(5px);
+    }
+    
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-15px);
+        }
+    }
+    
+    @keyframes rotate {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    
+    /* Confetti animation */
+    .confetti:nth-child(1) {
+        left: 10%;
+        animation: confettiFall 10s linear infinite;
+        animation-delay: 0s;
+        background-color: #f72585;
+    }
+    
+    .confetti:nth-child(2) {
+        left: 20%;
+        animation: confettiFall 8s linear infinite;
+        animation-delay: 1s;
+        background-color: #4361ee;
+    }
+    
+    .confetti:nth-child(3) {
+        left: 30%;
+        animation: confettiFall 12s linear infinite;
+        animation-delay: 3s;
+        background-color: #4cc9f0;
+    }
+    
+    .confetti:nth-child(4) {
+        left: 40%;
+        animation: confettiFall 9s linear infinite;
+        animation-delay: 2s;
+        background-color: #f8961e;
+    }
+    
+    .confetti:nth-child(5) {
+        left: 50%;
+        animation: confettiFall 11s linear infinite;
+        animation-delay: 4s;
+        background-color: #43aa8b;
+    }
+    
+    .confetti:nth-child(6) {
+        left: 60%;
+        animation: confettiFall 7s linear infinite;
+        animation-delay: 1.5s;
+        background-color: #577590;
+    }
+    
+    .confetti:nth-child(7) {
+        left: 70%;
+        animation: confettiFall 10s linear infinite;
+        animation-delay: 2.5s;
+        background-color: #f94144;
+    }
+    
+    .confetti:nth-child(8) {
+        left: 80%;
+        animation: confettiFall 8s linear infinite;
+        animation-delay: 0.5s;
+        background-color: #90be6d;
+    }
+    
+    .confetti:nth-child(9) {
+        left: 90%;
+        animation: confettiFall 9s linear infinite;
+        animation-delay: 3.5s;
+        background-color: #7209b7;
+    }
+    
+    .confetti:nth-child(10) {
+        left: 95%;
+        animation: confettiFall 12s linear infinite;
+        animation-delay: 2s;
+        background-color: #4895ef;
+    }
+    
+    @keyframes confettiFall {
+        0% {
+            transform: translateY(-100vh) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .congrats-card {
+            padding: 30px 20px;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+        }
+        
+        .employee-pic-container {
+            width: 120px;
+            height: 120px;
+        }
+    }
+</style>
+
+<script>
+    // Add some interactive effects
+    document.addEventListener('DOMContentLoaded', function() {
+        const card = document.querySelector('.congrats-card');
+        
+        // Tilt effect on mouse move
+        card.addEventListener('mousemove', function(e) {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+        
+        // Reset when mouse leaves
+        card.addEventListener('mouseleave', function() {
+            card.style.transform = 'rotateY(0deg) rotateX(0deg)';
+        });
+    });
+</script>

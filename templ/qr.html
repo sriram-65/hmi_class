@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Payment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</head>
+<body>
+   
+    <div class="container">
+        <div class="row">
+           <div class="col-md-6">
+                <p id="status">
+           <h1 style="margin-top:3em" id="qr">Scan This Qr code and</h1> 
+         <br>
+         <h3 id="comp">Complete Payment 500 Ruppes</h3>
+          
+         
+           </div>
+           <div class="col-md-6">
+                <img src="https://res.cloudinary.com/dbrmvywb0/image/upload/v1750842751/gp3l91opm45tz3ipznow.jpg" class="img-fluid" width="350" id="img"/>
+           </div>
+        </div>
+
+    </div>
+    <br>
+    <br>
+    <p class="text-muted  text-center ">Pay With G-Pay or Any Other Payment Providers</p>
+
+</body>
+</html>
+
+<style>
+body{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width:100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.comp{
+    color:green;
+}
+
+
+
+</style>
+<script>
+
+    window.addEventListener("load" , function(){
+        let imgsrc = "https://cdn.dribbble.com/userupload/22025149/file/original-4a022716a621bb8daacf17794b7b005f.gif"
+        localStorage.setItem("imglink" , imgsrc)
+    })
+
+    let statuspayment = document.getElementById("status")
+    let img = document.querySelector("img")
+    let comp = document.getElementById("comp")
+
+    function GetPayment(){
+       fetch("/get-data-payment").then(res=>res.json()).then(data=>{
+        if (data.User.payment_completed == true){
+            
+            let imglink = localStorage.getItem("imglink")
+            img.src = imglink;
+            comp.innerHTML = "Payment Completed Suessfuly ✔"
+            comp.classList.add("comp")
+            
+
+            let timer = 5
+
+            setInterval(function(){
+                    timer--
+
+                    if(timer==0){
+                         window.location.href = "/dash"
+                    }
+                    document.getElementById("qr").innerHTML = "You Will Be Redirected in " + timer;
+
+            } , 1000)
+
+            
+
+          
+
+            clearInterval(x)
+        }
+        
+    }).catch(er=>console.log(er))
+    }
+    
+    let x = setInterval(GetPayment , 1000)
+</script>

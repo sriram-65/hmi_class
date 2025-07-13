@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+
+    <nav id="nav">
+        <div class="logo">
+            <a href="https://hmi-proj.vercel.app/">HMI</a>
+        </div>
+
+        <div class="links">
+            <a href="/dash/settings/{{email}}">Settings</a>
+            <a href="/clear">Logout</a>
+        </div>
+    </nav>
+
+
+    
+
+     <section id="courses">
+        <div class="container">
+            <p class="text-muted text-center">welcome , {{email}}</p>
+            <h1 class="text-center">Welcome To The Course Class By ThirulingeshWar</h1>
+            <p class="text-muted text-center">Courses Videos When You Complete Just Click the Completed Button and Then We Connect .</p>
+
+        </div>
+    </section> 
+
+
+
+     
+
+  
+      <div class="card-container">
+        {% for i in c %}
+            <div class="card">
+            <p>Course Title : {{ i.title }}</p>
+            <p class='text-muted'>{{ i.des }}</p>
+            {{ i.video_link | safe }}
+            </div>
+        {% endfor %}
+        </div>
+       <button class="btn btn-dark m-3" style="position:fixed" id="cp"> Completed </button>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="comp" id="comp">
+        <div class="container">
+        <div class="row mb-3">
+            {%if h.accept == true%}
+              {%if h.status == "Fail"%}
+                <div id="failed" style="display:none">
+                <h1 style="color:red">We Are Sorry You Failed in Interview</h1>
+                <button class="btn btn-danger" id="c">Yes , i Understand</button> 
+                </div>
+              {%else%}
+              
+            <h3 >Admin Accepted Your Request ✔</h3>
+            <p class="text-muted">Your Status Of Selection : {{h.status}}</p>
+            <p>Link To Join : {{h.link if h.link else "No Link Found"}}</p>
+            <button class="btn btn-danger" id="join"><a href="{{h.link}}" style="color:white">Join Now</a></button>
+           {%endif%}
+            {%else%}
+            {%if h.yes == true%}
+            <h3 id="req">Request is send to Admin</h3>
+            <p class="text-muted" id="wait">Wait For The Admin Response</p>
+            <button class="btn btn-danger" style="display: none;" id="join">Join Now</button>
+            {%else%}
+            <h1 class="text-center mb-4">
+                Are You Sure Want to Complete This Course ?
+            </h1>
+
+            <p class="text-muted">You Get the Google Meet Link From Admins</p>
+            <p class="text-muted">If You Pass on Interview Then Only You Selected As HMI Employee</p>
+            <p class="text-muted">If You Reject You Will Completely Study Again</p>
+             
+            <form action="/send-complete" method="POST">
+                <button class="btn btn-dark mb-3" id="yes">Yes , i Complted</button>
+            </form>
+            
+            <button class="btn btn-danger" id="no">No</button>
+           
+           {%endif%}
+            
+           {%endif%}
+            
+        </div>
+    </div>
+    </div>
+    
+
+</body>
+</html>
+
+<style>
+    body{
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    nav{
+        width:100%;
+        height:55px;
+        box-shadow:3px 3px 1px black;
+        margin-top:20px;
+        display: flex;
+        justify-content: space-between;
+
+    }
+    
+    nav .links{
+        display: flex;
+        gap:30px;
+        margin-right:20px;
+    }
+    nav a{
+        text-decoration: none;
+    }
+
+    .logo{
+        margin-left:20px;
+        font-size:25px;
+    }
+
+    section{
+        margin-top:30px;
+    }
+
+    section h1{
+        font-weight:700;
+    }
+
+    .i{
+        margin-top:60px;
+        text-align:center;
+    }
+
+    .card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    margin-left:12em;
+    margin-top:45px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    padding: 20px;
+    transition: transform 0.2s ease;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+  }
+
+  .card p {
+    margin: 10px 0;
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+  }
+
+  .card p:first-child {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #1a73e8;
+  }
+
+  iframe {
+    width: 100%;
+    height: 200px;
+    border-radius: 12px;
+    margin-top: 10px;
+  }
+
+  .comp{
+    max-width: 600px;
+    padding:30px 30px 40px;
+    position: fixed;
+    top:50%;
+    left:50%;
+    transform: translate(-50% , -50%);
+    z-index: 1000;
+    background-color: #fff;
+    border-radius: 10px;
+    display: none;
+    transition: 0.7s;
+  }
+
+  
+
+  .overlay{
+    width:100%;
+    height: 100vh;
+    background-color: #0000008f;
+    backdrop-filter: blur(7px);
+    position: absolute;
+    top:0;
+    z-index: 100;
+    display: none;
+  }
+
+</style>
+<script>
+    let overlay = document.getElementById("overlay")
+    let comp = document.getElementById("comp")
+    let cp = document.getElementById("cp")
+
+    let yes = document.getElementById("yes")
+    let no = document.getElementById("no")
+    
+    window.addEventListener("load" , function(){
+     let c = '{{h.yes}}'
+     
+    if (c=="True"){
+        comp.style.display = "block";
+        overlay.style.display = "block";
+    }
+    
+    let passorfail = '{{h.status}}'
+
+    if(passorfail == "Fail"){
+            document.getElementById("failed").style.display = "block"
+
+            document.getElementById("c").onclick = function(){
+                  comp.style.display = "none";
+                  overlay.style.display = "none"
+            }
+    }
+    })
+  
+    cp.onclick = function(){
+        comp.style.display = "block";
+        overlay.style.display = "block";
+        
+    }
+
+    try{
+     no.onclick = function(){
+        comp.style.display = "none";
+        overlay.style.display = "none"
+    }
+    }
+    catch{
+        console.log("Server is sending Req,.")
+    }
+    
+ 
+
+    fetch("https://payload-red.vercel.app/get-url").then(res=>res.json()).then(data=>{
+        const socket = io(data['url'])
+         
+        socket.on("message" , function(msg){
+         let takeEmail = msg.split(",")
+         if(takeEmail[0]=="{{email}}"){
+            document.getElementById("req").innerHTML = "Admin Accepted Your Request ✔"
+            document.getElementById("req").style.color='green'
+            document.getElementById("wait").innerHTML = takeEmail[1];
+            document.getElementById("join").style.display = "block"
+         }
+        })
+    })
+
+
+    
+
+   
+
+
+</script>

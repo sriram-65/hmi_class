@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - {{data["employee_email"]}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .profile-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        .profile-card img {
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 3px solid #4CAF50;
+        }
+        .profile-card h2 {
+            margin: 10px 0 5px;
+            color: #333;
+        }
+        .profile-card p {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        .logout-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 20px;
+            background-color: #ff4d4d;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #e60000;
+        }
+    </style>
+</head>
+<body>
+  
+    
+    <div class="profile-card">
+        <img src="{{photo}}" alt="Profile Image" width="280" height="260" />
+        <h2>Email : {{data["employee_email"]}}</h2>
+        <p><strong>Role:</strong> {{data["role"]}}</p>
+        <p><strong>Phone:</strong> {{data["employes_phone_no"]}}</p>
+        <a class="logout-btn" href="/clear">Logout</a>
+    </div>
+</body>
+</html>
