@@ -19,7 +19,7 @@ def HomeLogin():
       if not emp:
           return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Not Found !")
       
-      if not hmi:
+      if hmi:
           return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Already Found Use Different Phone Number !")
       
       data = {
