@@ -152,7 +152,7 @@
   </div>
 
   <script>
-    let ac = document.getElementById("ac");
+    let ac = document.querySelectorAll("ac");
 
     fetch("https://payload-red.vercel.app/get-url")
       .then(res => res.json())
@@ -160,7 +160,10 @@
         if (data['url']) {
           let socket = io(data['url']);
           console.log("Socket connected:", data['url']);
-          ac.onclick = function () {
+
+          ac.forEach(acs =>{
+            acs.onclick = function(){
+            
             let e = document.getElementById("email").value;
             let l = document.getElementById("meet").value;
             fetch(`/accept?link=${l}&email=${e}`)
@@ -172,7 +175,9 @@
               email: e,
               link: l
             });
-          };
+
+            }
+          });
         }
       })
       .catch(err => console.log(err));
