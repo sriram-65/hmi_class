@@ -119,9 +119,10 @@
         <p><strong>Phone:</strong> {{ i.employes_phone_no }}</p>
         <p><strong>Role:</strong> {{ i.role }}</p>
 
-        <input type="text" placeholder="Enter Google Meet Link" id="meet">
-        <input type="hidden" value="{{ i.employee_email }}" id="email">
-        <button id="ac">Accept & Send Link</button>
+        <input type="text" placeholder="Enter Google Meet Link" class="meet">
+        <input type="hidden" value="{{ i.employee_email }}" class="email">
+
+        <button  onclick="getac(this)">Accept & Send Link</button>
 
         <form action="/set-status" method="POST">
           <input type="hidden" name="email-id" value="{{ i.employee_email }}">
@@ -152,35 +153,49 @@
   </div>
 
   <script>
-    let ac = document.querySelectorAll("ac");
+    
+  let socket = null;
 
-    fetch("https://payload-red.vercel.app/get-url")
+  // Connect to dynamic Socket.IO URL
+  fetch("https://payload-red.vercel.app/get-url")
+    .then(res => res.json())
+    .then(data => {
+      if (data['url']) {
+        socket = io(data['url']);
+        console.log("Socket connected:", data['url']);
+      }
+    })
+    .catch(err => console.error("Socket connection error:", err));
+
+
+  function getac(button) {
+    const parentCard = button.closest('.card'); // Get parent card
+    const email = parentCard.querySelector(".email").value;
+    const link = parentCard.querySelector(".meet").value;
+
+    if (!email || !link) {
+      alert("Please enter both Email and Meet link.");
+      return;
+    }
+
+   
+    fetch(`/accept?link=${encodeURIComponent(link)}&email=${encodeURIComponent(email)}`)
       .then(res => res.json())
-      .then(data => {
-        if (data['url']) {
-          let socket = io(data['url']);
-          console.log("Socket connected:", data['url']);
+      .then(data => console.log("Server response:", data))
+      .catch(err => console.error("Fetch error:", err));
 
-          ac.forEach(acs =>{
-            acs.onclick = function(){
-            
-            let e = document.getElementById("email").value;
-            let l = document.getElementById("meet").value;
-            fetch(`/accept?link=${l}&email=${e}`)
-              .then(res => res.json())
-              .then(data => console.log(data))
-              .catch(err => console.error(err));
+    if (socket) {
+      socket.emit("message", {
+        email: email,
+        link: link
+      });
+      console.log("Message emitted:", { email, link });
+    } else {
+      console.warn("Socket not connected yet");
+    }
+  }
+</script>
 
-            socket.emit("message", {
-              email: e,
-              link: l
-            });
 
-            }
-          });
-        }
-      })
-      .catch(err => console.log(err));
-  </script>
 </body>
 </html>
