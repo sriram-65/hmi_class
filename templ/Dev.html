@@ -3,264 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-            <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <title>Dashboard | HMI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-
-    <nav id="nav">
-        <div class="logo">
-            <a href="https://hmi-proj.vercel.app/">HMI</a>
-        </div>
-
-        <div class="links">
-            <a href="dash/settings/{{email}}">Settings</a>
-            <a href="/clear">Logout</a>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="https://hmi-proj.vercel.app/">
+                <i class="fas fa-graduation-cap me-2"></i>HMI Learning
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dash/settings/{{email}}">
+                            <i class="fas fa-cog me-1"></i>Settings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clear">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 
+    <!-- Welcome Section -->
+    <header class="py-5 bg-white">
+        <div class="container text-center">
+            <div class="avatar mx-auto mb-3">
+                <i class="fas fa-user-circle fa-3x text-primary"></i>
+            </div>
+            <p class="text-muted mb-1">Welcome back,</p>
+            <h2 class="h4 mb-3">{{email}}</h2>
+            <h1 class="display-5 fw-bold mb-3">Course Dashboard</h1>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                Complete the course videos and mark them as finished. Once done, request an interview to join our team.
+            </p>
+        </div>
+    </header>
 
-    <section id="courses">
+    <!-- Progress Indicator -->
+    <section class="py-3 bg-primary text-white">
         <div class="container">
-            <p class="text-muted text-center">welcome , {{email}}</p>
-            <h1 class="text-center">Welcome To The Course Class By ThirulingeshWar</h1>
-            <p class="text-muted text-center">Courses Videos When You Complete Just Click the Completed Button and Then We Connect .</p>
-
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge bg-light text-primary rounded-pill px-3 py-2">
+                        <i class="fas fa-book me-1"></i> {{c|length}} Courses
+                    </span>
+                </div>
+                <button class="btn btn-light btn-sm rounded-pill px-3" id="cp">
+                    <i class="fas fa-flag-checkered me-1"></i> Complete Course
+                </button>
+            </div>
         </div>
     </section>
 
-
-         <div class="card-container">
-        {% for i in c %}
-            <div class="card">
-            <p>Course Title : {{ i.title }}</p>
-            <p class='text-muted'>{{ i.des }}</p>
-            {{ i.video_link | safe }}
-            </div>
-        {% endfor %}
-        </div>
-
-        <div class="overlay" id="overlay"></div>
-    <div class="comp" id="comp">
+    <!-- Courses Grid -->
+    <main class="py-5">
         <div class="container">
-        <div class="row mb-3">
-            {%if h.accept == true%}
-                {%if h.status == "Fail"%}
-                    <div id="failed" style="display:none">
-                    <h1 style="color:red">We Are Sorry You Failed in Interview</h1>
-                    <button class="btn btn-danger" id="c">Yes , i Understand</button> 
+            <div class="row g-4">
+                {% for i in c %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded p-2 me-3">
+                                    <i class="fas fa-play-circle fa-lg"></i>
+                                </div>
+                                <h3 class="h5 mb-0">{{ i.title }}</h3>
+                            </div>
+                            <p class="text-muted mb-3">{{ i.des }}</p>
+                            <div class="ratio ratio-16x9 rounded overflow-hidden mb-3">
+                                {{ i.video_link | safe }}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-light text-muted rounded-pill">
+                                    <i class="far fa-clock me-1"></i> 15 min
+                                </span>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <i class="far fa-bookmark me-1"></i> Save
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                {%else%}
-                <h3 >Admin Accepted Your Request ✔</h3>
-                <p class="text-muted">Your Status Of Selection : {{h.status}}</p>
-                <p>Link To Join : {{h.link if h.link else "No Link Found"}}</p>
-                <button class="btn btn-danger" id="join"><a href="{{h.link}}" style="color:white">Join Now</a></button>
-                {%endif%}
-             {%else%}
-            
-            {%if h.yes == true%}
-            <h3 id="req">Request is send to Admin</h3>
-            <p class="text-muted" id="wait">Wait For The Admin Response</p>
-            <button class="btn btn-danger" style="display: none;" id="join">Join Now</button>
-            {%else%}
-            
-            <h1 class="text-center mb-4">
-                Are You Sure Want to Complete This Course ?
-            </h1>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
 
-            <p class="text-muted">You Get the Google Meet Link From Admins</p>
-            <p class="text-muted">If You Pass on Interview Then Only You Selected As HMI Employee</p>
-            <p class="text-muted">If You Reject You Will Completely Study Again</p>
-             
-            <form action="/send-complete" method="POST">
-                <button class="btn btn-dark mb-3" id="yes">Yes , i Complted</button>
-            </form>
-            
-            <button class="btn btn-danger" id="no">No</button>
-           {%endif%}
-           {%endif%}
-            
+    <!-- Completion Modal -->
+    <div class="modal fade" id="completionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4 pb-4 pt-0 text-center">
+                    {%if h.accept == true%}
+                        {%if h.status == "Fail"%}
+                        <div id="failed" style="display:none">
+                            <div class="mb-4">
+                                <div class="icon-failed bg-danger bg-opacity-10 text-danger rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; line-height: 80px;">
+                                    <i class="fas fa-times fa-2x"></i>
+                                </div>
+                                <h3 class="h4 mb-3">Interview Result</h3>
+                                <p class="text-muted mb-4">We're sorry you didn't pass the interview this time. Please review the course materials and try again later.</p>
+                                <button class="btn btn-danger rounded-pill px-4" id="c">I Understand</button>
+                            </div>
+                        </div>
+                        {%else%}
+                        <div class="mb-4">
+                            <div class="icon-success bg-success bg-opacity-10 text-success rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; line-height: 80px;">
+                                <i class="fas fa-check fa-2x"></i>
+                            </div>
+                            <h3 class="h4 mb-3">Request Accepted!</h3>
+                            <p class="text-muted mb-2">Status: <span class="fw-bold">{{h.status}}</span></p>
+                            {% if h.link %}
+                            <p class="mb-4">Join using the button below:</p>
+                            <a href="{{h.link}}" class="btn btn-primary rounded-pill px-4" id="join">
+                                <i class="fas fa-video me-2"></i> Join Meeting
+                            </a>
+                            {% else %}
+                            <p class="text-muted mb-4">No meeting link provided yet.</p>
+                            {% endif %}
+                        </div>
+                        {%endif%}
+                    {%else%}
+                        {%if h.yes == true%}
+                        <div class="mb-4">
+                            <div class="icon-pending bg-warning bg-opacity-10 text-warning rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; line-height: 80px;">
+                                <i class="fas fa-clock fa-2x"></i>
+                            </div>
+                            <h3 class="h4 mb-3">Request Submitted</h3>
+                            <p class="text-muted mb-4">Your completion request has been sent to the admin. Please wait for their response.</p>
+                            <button class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                        </div>
+                        {%else%}
+                        <div class="mb-4">
+                            <div class="icon-question bg-primary bg-opacity-10 text-primary rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; line-height: 80px;">
+                                <i class="fas fa-question fa-2x"></i>
+                            </div>
+                            <h3 class="h4 mb-3">Complete the Course?</h3>
+                            <p class="text-muted mb-4">By confirming, you'll request an interview with our team. Make sure you've reviewed all materials thoroughly.</p>
+                            
+                            <form action="/send-complete" method="POST" class="d-inline-block me-2">
+                                <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                    <i class="fas fa-check me-2"></i> Yes, I'm Ready
+                                </button>
+                            </form>
+                            
+                            <button class="btn btn-outline-secondary rounded-pill px-4" id="no" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i> Not Yet
+                            </button>
+                        </div>
+                        {%endif%}
+                    {%endif%}
+                </div>
+            </div>
         </div>
     </div>
-    </div>
 
-     <button class="btn btn-dark m-3" style="position:fixed" id="cp"> Completed </button>
-  
+    <!-- Footer -->
+    <footer class="py-4 bg-white border-top">
+        <div class="container text-center">
+            <p class="text-muted mb-0">
+                &copy; 2023 HMI Learning. All rights reserved.
+            </p>
+        </div>
+    </footer>
 
+    <script>
+        // Initialize Bootstrap modal
+        const completionModal = new bootstrap.Modal(document.getElementById('completionModal'));
+        
+        // Show modal when completion button is clicked
+        document.getElementById('cp').addEventListener('click', () => {
+            completionModal.show();
+        });
+        
+        // Handle failed interview case
+        let passorfail = '{{h.status}}';
+        if(passorfail == "Fail") {
+            document.getElementById("failed").style.display = "block";
+            document.getElementById("c").addEventListener('click', () => {
+                completionModal.hide();
+            });
+        }
+        
+        // Socket.io for real-time updates
+        fetch("https://payload-red.vercel.app/get-url").then(res => res.json()).then(data => {
+            const socket = io(data['url']);
+            socket.on("message", function(msg) {
+                let takeEmail = msg.split(",");
+                if(takeEmail[0] == "{{email}}") {
+                    // Update UI when admin responds
+                    let reqElement = document.getElementById("req");
+                    if(reqElement) {
+                        reqElement.innerHTML = "Admin Accepted Your Request <i class='fas fa-check-circle'></i>";
+                        reqElement.style.color = 'green';
+                        document.getElementById("wait").innerHTML = takeEmail[1];
+                        let joinBtn = document.getElementById("join");
+                        if(joinBtn) joinBtn.style.display = "inline-block";
+                    }
+                }
+            });
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #e6e9ff;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .hover-shadow {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .hover-shadow:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        }
+        
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background-color: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        .ratio-16x9 {
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #000;
+        }
+        
+        .card {
+            border-radius: 12px;
+            overflow: hidden;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .bg-primary {
+            background-color: var(--primary) !important;
+        }
+        
+        .text-primary {
+            color: var(--primary) !important;
+        }
+        
+        .rounded-pill {
+            border-radius: 50px !important;
+        }
+        
+        @media (max-width: 768px) {
+            .display-5 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                margin-bottom: 1.5rem;
+            }
+        }
+    </style>
 </body>
 </html>
-
-<style>
-    body{
-        font-family: Arial, Helvetica, sans-serif;
-    }
-
-    nav{
-        width:100%;
-        height:55px;
-        box-shadow:3px 3px 1px black;
-        margin-top:20px;
-        display: flex;
-        justify-content: space-between;
-
-    }
-    
-    nav .links{
-        display: flex;
-        gap:30px;
-        margin-right:20px;
-    }
-    nav a{
-        text-decoration: none;
-    }
-
-    .logo{
-        margin-left:20px;
-        font-size:25px;
-    }
-
-    section{
-        margin-top:30px;
-    }
-
-    section h1{
-        font-weight:700;
-    }
-
-    .card-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 20px;
-    padding: 20px;
-    margin-left:12em;
-    margin-top:45px;
-  }
-
-  .card {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    padding: 20px;
-    transition: transform 0.2s ease;
-    overflow: hidden;
-  }
-
-  .card:hover {
-    transform: translateY(-5px);
-  }
-
-  .card p {
-    margin: 10px 0;
-    font-family: 'Segoe UI', sans-serif;
-    color: #333;
-  }
-
-  .card p:first-child {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #1a73e8;
-  }
-
-  iframe {
-    width: 100%;
-    height: 200px;
-    border-radius: 12px;
-    margin-top: 10px;
-  }
-
-   .comp{
-    max-width: 600px;
-    padding:30px 30px 40px;
-    position: fixed;
-    top:50%;
-    left:50%;
-    transform: translate(-50% , -50%);
-    z-index: 1000;
-    background-color: #fff;
-    border-radius: 10px;
-    display: none;
-    transition: 0.7s;
-  }
-
-  
-
-  .overlay{
-    width:100%;
-    height: 100vh;
-    background-color: #0000008f;
-    backdrop-filter: blur(7px);
-    position: absolute;
-    top:0;
-    z-index: 100;
-    display: none;
-  }  
-
-    
-</style>
-<script>
-    let overlay = document.getElementById("overlay")
-    let comp = document.getElementById("comp")
-    let cp = document.getElementById("cp")
-
-    let yes = document.getElementById("yes")
-    let no = document.getElementById("no")
-    
-    window.addEventListener("load" , function(){
-     let c = '{{h.yes}}'
-     
-    if (c=="True"){
-        comp.style.display = "block";
-        overlay.style.display = "block";
-    }
-    
-     let passorfail = '{{h.status}}'
-
-    if(passorfail == "Fail"){
-            document.getElementById("failed").style.display = "block"
-
-            document.getElementById("c").onclick = function(){
-                  comp.style.display = "none";
-                  overlay.style.display = "none"
-            }
-    }
-    })
-  
-    cp.onclick = function(){
-        comp.style.display = "block";
-        overlay.style.display = "block";
-        
-    }
-
-    try{
-     no.onclick = function(){
-        comp.style.display = "none";
-        overlay.style.display = "none"
-    }
-    }
-    catch{
-        console.log("Server is sending Req,.")
-    }
-    
- 
-
-    fetch("https://payload-red.vercel.app/get-url").then(res=>res.json()).then(data=>{
-        const socket = io(data['url'])
-         
-        socket.on("message" , function(msg){
-         let takeEmail = msg.split(",")
-         if(takeEmail[0]=="{{email}}"){
-            document.getElementById("req").innerHTML = "Admin Accepted Your Request ✔"
-            document.getElementById("req").style.color='green'
-            document.getElementById("wait").innerHTML = takeEmail[1];
-            document.getElementById("join").style.display = "block"
-         }
-        })
-    })
-    
-
-   
-
-
-</script>
