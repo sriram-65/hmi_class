@@ -10,40 +10,38 @@ def HomeLogin():
     
     if session.get("email"):
         return redirect("/dash")
-    
-    if request.method == "POST":  
-      phone_no = request.form.get("phone_no")
-      
-      emp = EMPLOYEE_REGISTER.find_one({"Employee_phone_no":phone_no})
-      hmi = HMI_CLASS_REG.find_one({"employee_email":emp["Employee_email"]})
-      if not emp:
-          return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Not Found !")
-      
-      if hmi:
-          return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Already Found Use Different Phone Number !")
-      
-      data = {
-          "employee_email":emp['Employee_email'],
-          "employes_phone_no":emp["Employee_phone_no"],
-          "role":emp["Employee_Role"],
-          "payment_completed":False,
-          "yes":False,
-          "accept":False,
-          "link":"",
-          "status":"pending...."
-      }
-      
-      HMI_CLASS_REG.insert_one(data)
-      
-      session["email"] = emp["Employee_email"]
-      session.permanent = True
-      
-      return redirect("/dash")
-  
-    return render_template("index.html")
-      
-          
-      
+    try:
+        if request.method == "POST":  
+            phone_no = request.form.get("phone_no")
+            
+            emp = EMPLOYEE_REGISTER.find_one({"Employee_phone_no":phone_no})
+            hmi = HMI_CLASS_REG.find_one({"employee_email":emp["Employee_email"]})
+            
+            
+            if hmi:
+                return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Already Found Use Different Phone Number !")
+            
+            data = {
+                "employee_email":emp['Employee_email'],
+                "employes_phone_no":emp["Employee_phone_no"],
+                "role":emp["Employee_Role"],
+                "payment_completed":False,
+                "yes":False,
+                "accept":False,
+                "link":"",
+                "status":"pending...."
+            }
+            
+            HMI_CLASS_REG.insert_one(data)
+            
+            session["email"] = emp["Employee_email"]
+            session.permanent = True
+            
+            return redirect("/dash")
+        return render_template("index.html")
+    except:
+        return render_template("index.html" , err='User Not Found')
+        
 @home.route("/dash")
 def dashboard():
     if not session.get("email"):
@@ -72,9 +70,9 @@ def dashboard():
                 return render_template("qr.html")
         else:
             return "Invalid Or Not Authorized"
-    except:
+    except Exception as e:
         ip = request.remote_addr
-        return render_template("err.html" , ip=ip)
+        return render_template("err.html" , ip=ip , e=e)
 
 
 @home.route("/apply-payment-completed/<email_id>" , methods=["POST"])
@@ -198,6 +196,10 @@ def delete():
     delete_All()
     return jsonify({"suess":"deleted Suessfully"})
 
+@home.route("/delete/<email>")
+def delete_one_email(email):
+    HMI_CLASS_REG.find_one_and_delete({"employee_email":email})
+    return jsonify("Suess...")
 
 @home.route("/clear")
 def logout():
