@@ -76,9 +76,11 @@ body{
                     timer--
 
                     if(timer==0){
+                         clearInterval(x)
+                         document.getElementById("qr").innerHTML = "You Will Be Redirected in " + timer;
                          window.location.href = "/dash"
                     }
-                    document.getElementById("qr").innerHTML = "You Will Be Redirected in " + timer;
+                    
 
             } , 1000)
 

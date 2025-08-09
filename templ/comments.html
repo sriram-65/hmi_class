@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Comments</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .course-details {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+
+        .comment-form {
+            margin-bottom: 30px;
+        }
+
+        .comment-form input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .comment-form button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back{
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .comment-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .comment {
+            background-color: #ffffff;
+            padding: 15px;
+            border-left: 5px solid #007bff;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .comment b {
+            color: #333;
+        }
+
+        .replies {
+            margin-top: 10px;
+            padding-left: 20px;
+            border-left: 2px dashed #999;
+        }
+
+        .replies p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .replies b {
+            color: green;
+        }
+
+    </style>
+</head>
+<body>
+   
+
+    <button onclick="history.back()" class="back">
+      Back
+    </button>
+    <div class="course-details">
+        <h2>{{ n.title }}</h2>
+        <p>{{ n.des }}</p>
+        <input type="hidden" vlaue="{{n.user_email}}" class="emails">
+        <div>{{ n.video_link | safe }}</div>
+    </div>
+
+    <!-- <form action="{{ url_for('routes.add_comments', c_id=n._id) }}" method="POST" class="comment-form">
+        <input type="text" name="comment" placeholder="Add a comment..." required>
+        <button type="submit">Comment</button>
+    </form> -->
+
+    {% for i in c %}
+    <div class="comment">
+        <p><b>{{ i.user_name }}</b>: {{ i.Comment }}</p>
+
+        
+        <!-- <form action="{{url_for('routes.Student_comment_del' , d_id=i._id)}}" method="POST">
+         <button>Delete Comment</button>
+        </form>
+         -->
+        {% if i.replies %}
+            <div class="replies">
+                {% for r in i.replies %}
+                    <p><b>{{ r.hmi }}</b>: {{ r.content }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+</body>
+</html>
+<script>
+
+    let h = document.querySelectorAll(".emails")
+
+    h.forEach(emails=>{
+        console.log(emails)
+    })
+
+
+</script>

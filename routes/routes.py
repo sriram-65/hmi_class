@@ -1,6 +1,8 @@
 from flask import Blueprint , request , render_template , session , redirect , url_for , jsonify
-from database.mongo import EMPLOYEE_REGISTER , HMI_CLASS_REG , COURSES , COMPLETED
+from database.mongo import EMPLOYEE_REGISTER , HMI_CLASS_REG , COURSES , COMPLETED , NOTES , COMMENTS
 from delroutes.dele import delete_All
+from cloud.cloudi import upload_notes
+from bson.objectid import ObjectId
 
 home = Blueprint("routes" , __name__)
 
@@ -190,16 +192,107 @@ def setstatus():
     }})
     
     return redirect('hmi-class/home')
+
+@home.route("/notes/students")
+def show_notes():
+    n = NOTES.find({}).sort("_id" , -1)
+    return render_template("notes.html" , n=n)
+
+@home.route("/admin/upload/notes" , methods=["POST" , "GET" , "DELETE"])
+def Upload_Notes():
+    if request.method == "POST":
+        cat = request.form.get("cat")
+        note = request.files.get("note")
+        
+        url = upload_notes(note)
+
+        data = {
+            "cat":cat,
+            "note_pdf":url,
+        }
+        NOTES.insert_one(data)
+        return redirect("/hmi-class/home")
+
+        
+    else:
+        all_Notes = NOTES.find({}).sort("_id" , -1)
+        return render_template("Upload_notes.html" , all_notes=all_Notes)
     
+@home.route("/admin/Delete" , methods=["POST"])
+def Delete_note():
+    note_id = request.form.get("note_id")
+    NOTES.find_one_and_delete({"_id":ObjectId(note_id)})
+    return redirect("/hmi-class/home")
+
+@home.route("/course-comments/<c_id>")
+def Comments(c_id):
+   n = COURSES.find_one({"_id":ObjectId(c_id)})
+   comment = COMMENTS.find({"c_id":c_id})
+   return render_template("comments.html" , n=n , c=comment)
+
+@home.route("/add-comments/<c_id>" , methods=["POST"])
+def add_comments(c_id):
+    text = request.form.get("comment")
+    email = session.get("email")
+    User = EMPLOYEE_REGISTER.find_one({"Employee_email":email})
+    data={
+        "Comment":text,
+        "user_email":email,
+        "user_name":User['Employee_name'],
+        "c_id":c_id,
+    }
+    COMMENTS.insert_one(data)
+    return redirect(url_for('routes.Comments' , c_id=c_id))
+
+
+
+@home.route("/admin/activity")
+def activity():
+    c = COMMENTS.find({}).sort("_id" , -1)
+    return render_template("Activity.html" , c=c)
+
 @home.route("/delete")
 def delete():
     delete_All()
     return jsonify({"suess":"deleted Suessfully"})
 
+
+@home.route("/reply/<mail>" , methods=["POST"])
+def Rep_Comment(mail):
+   content = request.form.get("content")
+
+   hmi = "@HMIADMIN✅"
+
+   reply = {
+       "content":content,
+       "for":mail,
+       "hmi":hmi
+   }
+   COMMENTS.find_one_and_update({"user_email":mail} , {"$push":{"replies":reply}})
+
+   return redirect("/admin/activity")
+   
+
+
+@home.route("/delete/admin/comment/<d_id>" , methods=["POST"])
+def Delete_comment(d_id):
+    COMMENTS.find_one_and_delete({"_id":ObjectId(d_id)})  
+    return redirect("/admin/activity") 
+
+@home.route("/check-owner/<email_id>")
+def check_email(email_id):
+    e = session.get("email")
+
+    if email_id == e:
+        return jsonify({"owner":True})
+    else:
+        return jsonify({"owner":False})
+
 @home.route("/delete/<email>")
 def delete_one_email(email):
     HMI_CLASS_REG.find_one_and_delete({"employee_email":email})
     return jsonify("Suess...")
+
 
 @home.route("/clear")
 def logout():

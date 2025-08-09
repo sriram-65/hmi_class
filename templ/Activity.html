@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students Activity</title>
+</head>
+<body>
+
+    {%for i in c%}
+    
+    <p><b>{{i.user_name}}</b> : {{i.Comment}}</p>
+
+    <form action="{{url_for('routes.Delete_comment' , d_id=i._id)}}" method="POST" onsubmit="return confirm('Are you Sure Want to Delete this')">
+        <button>Delete Comment</button>
+    </form>
+
+    <form action="{{url_for('routes.Rep_Comment' , mail=i.user_email)}}" method="POST">
+        
+    <input type="text" placeholder="reply Now" name="content">
+    
+    <button>Reply</button>
+    </form>
+
+    {%endfor%}
+
+    
+    
+</body>
+</html>

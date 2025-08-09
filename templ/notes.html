@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes Display</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .note-card {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 800px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .note-cat {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .download-btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .download-btn:hover {
+      background-color: #0056b3;
+    }
+    #back{
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 15px;
+      background-color: #021b35;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+    <button onclick="history.back()" id="back">Back</button>
+
+  <h1>All Notes Have Been Displayed</h1>
+
+  {% for i in n %}
+    <div class="note-card">
+      <div class="note-cat">Category : {{ i.cat }}</div>
+      <iframe src="{{ i.note_pdf }}" frameborder="0"></iframe>
+      <a href="{{ i.note_pdf }}" class="download-btn" id="d" >Download PDF</a>
+    </div>
+  {% endfor %}
+
+</body>
+</html>
+<script>
+    let download_btn = document.querySelectorAll(".download-btn")
+    download_btn.forEach(b=>{
+        b.addEventListener("click" , function(e){
+            e.preventDefault()
+              fetch(b.href)
+        .then(res=>res.blob())
+        .then(data=>{
+            const url = window.URL.createObjectURL(data);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = new Date().getMilliseconds();
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }).catch(e=>console.log(e))
+        })
+    })
+</script>
