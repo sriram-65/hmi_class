@@ -20,7 +20,7 @@ def HomeLogin():
             hmi = HMI_CLASS_REG.find_one({"employee_email":emp["Employee_email"]})
             
             
-            if hmi['isLogged']==True:
+            if hmi:
                 return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Already Logged Use Different Phone Number !")
             
             data = {
@@ -316,9 +316,5 @@ def delete_one_email(email):
 
 @home.route("/clear")
 def logout():
-    e = session.get("email")
-    HMI_CLASS_REG.find_one_and_update({"employee_email":e} , {"$set":{
-        "isLogged":False
-    }})
     session.clear()
     return redirect("/")
