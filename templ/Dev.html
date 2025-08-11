@@ -41,6 +41,11 @@
             <p>Course Title : {{ i.title }}</p>
             <p class='text-muted'>{{ i.des }}</p>
             {{ i.video_link | safe }}
+                <br>
+                <br>
+            <form action="{{url_for('routes.Comments' , c_id=i._id)}}">
+            <button class="btn btn-dark">View Comments</button>
+            </form>
             </div>
         {% endfor %}
         </div>
