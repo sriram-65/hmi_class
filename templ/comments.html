@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Comments</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -69,6 +70,20 @@
             padding-left: 20px;
             border-left: 2px dashed #999;
         }
+        .delete{
+            padding:10px 10px 10px;
+            border:none;
+            outline: none;
+            cursor: pointer;
+            transition: 0.5s;
+        }
+
+        .delete:hover{
+            transition: 0.5s;
+            background-color: #0056b3;
+            color:#f9f9f9;
+            border-radius: 20px;
+        }
 
         .replies p {
             margin: 5px 0;
@@ -90,24 +105,30 @@
     <div class="course-details">
         <h2>{{ n.title }}</h2>
         <p>{{ n.des }}</p>
-        <input type="hidden" vlaue="{{n.user_email}}" class="emails">
+        
+        
         <div>{{ n.video_link | safe }}</div>
     </div>
 
-    <!-- <form action="{{ url_for('routes.add_comments', c_id=n._id) }}" method="POST" class="comment-form">
-        <input type="text" name="comment" placeholder="Add a comment..." required>
-        <button type="submit">Comment</button>
-    </form> -->
+   
+    <h1>Comments</h1>
+    
+    <form action="{{url_for('routes.add_comments' , c_id=n._id)}}" method="POST" class="comment-form">
+        <input type="text" placeholder="Add Your Comment" name="comment">
+        <button>Add</button>
+    </form>
 
     {% for i in c %}
     <div class="comment">
-        <p><b>{{ i.user_name }}</b>: {{ i.Comment }}</p>
-
+    <form action="{{url_for('routes.Delete_Comment' , d_id=i._id)}}" method="POST" class="cid">
         
-        <!-- <form action="{{url_for('routes.Student_comment_del' , d_id=i._id)}}" method="POST">
-         <button>Delete Comment</button>
-        </form>
-         -->
+    </form>
+
+    
+        <p><b>{{ i.user_name }}</b>: {{ i.Comment }}</p>
+        <input type="hidden" value="{{i.user_email}}" class="emails">
+        
+         
         {% if i.replies %}
             <div class="replies">
                 {% for r in i.replies %}
@@ -122,11 +143,23 @@
 </html>
 <script>
 
-    let h = document.querySelectorAll(".emails")
-
-    h.forEach(emails=>{
-        console.log(emails)
-    })
+    let emails = document.querySelectorAll(".emails");
+    let commentContainers = document.querySelectorAll(".cid");
+    
+    emails.forEach((emailElem, index) => {
+        fetch(`/check-owner/${emailElem.value}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.owner === true) {
+                    let button = document.createElement("button");
+                    button.classList.add("delete")
+                    button.innerHTML = `<i class="fa-solid fa-trash"></i>`;
+                    commentContainers[index].appendChild(button);
+                }
+              
+            })
+            .catch(err => console.error(err));
+    });
 
 
 </script>

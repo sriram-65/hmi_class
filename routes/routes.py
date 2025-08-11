@@ -20,8 +20,8 @@ def HomeLogin():
             hmi = HMI_CLASS_REG.find_one({"employee_email":emp["Employee_email"]})
             
             
-            if hmi:
-                return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Already Found Use Different Phone Number !")
+            if hmi['isLogged']==True:
+                return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Already Logged Use Different Phone Number !")
             
             data = {
                 "employee_email":emp['Employee_email'],
@@ -31,6 +31,7 @@ def HomeLogin():
                 "yes":False,
                 "accept":False,
                 "link":"",
+                "isLogged":True,
                 "status":"pending...."
             }
             
@@ -228,6 +229,7 @@ def Delete_note():
 def Comments(c_id):
    n = COURSES.find_one({"_id":ObjectId(c_id)})
    comment = COMMENTS.find({"c_id":c_id})
+   session['course'] = str(c_id)
    return render_template("comments.html" , n=n , c=comment)
 
 @home.route("/add-comments/<c_id>" , methods=["POST"])
@@ -249,7 +251,8 @@ def add_comments(c_id):
 @home.route("/admin/activity")
 def activity():
     c = COMMENTS.find({}).sort("_id" , -1)
-    return render_template("Activity.html" , c=c)
+    course = COURSES.find({}).sort("_id" , -1)
+    return render_template("Activity.html" , c=c , course=course)
 
 @home.route("/delete")
 def delete():
@@ -257,22 +260,26 @@ def delete():
     return jsonify({"suess":"deleted Suessfully"})
 
 
-@home.route("/reply/<mail>" , methods=["POST"])
-def Rep_Comment(mail):
+@home.route("/reply/<c_id>" , methods=["POST"])
+def Rep_Comment(c_id):
    content = request.form.get("content")
 
    hmi = "@HMIADMIN✅"
 
    reply = {
        "content":content,
-       "for":mail,
+       "for":c_id,
        "hmi":hmi
    }
-   COMMENTS.find_one_and_update({"user_email":mail} , {"$push":{"replies":reply}})
+   COMMENTS.find_one_and_update({"c_id":c_id} , {"$push":{"replies":reply}})
 
    return redirect("/admin/activity")
    
 
+@home.route("/delete/reply/admin/<d_id>" , methods=["POST"])
+def Delete_Reply(d_id):
+    COMMENTS.find_one_and_update({"_id":ObjectId(d_id)} , {"$unset":{"replies":""}})
+    return redirect("/admin/activity")
 
 @home.route("/delete/admin/comment/<d_id>" , methods=["POST"])
 def Delete_comment(d_id):
@@ -288,6 +295,19 @@ def check_email(email_id):
     else:
         return jsonify({"owner":False})
 
+@home.route("/delete-comment/<d_id>" , methods=["POST"])
+def Delete_Comment(d_id):
+    
+    COMMENTS.delete_one({"_id":ObjectId(d_id)})
+    
+    return redirect(f"/course-comments/{session.get("course")}")
+
+
+@home.route("/delete/course/<c_id>" , methods=["POST"])
+def Delete_Course(c_id):
+    COURSES.find_one_and_delete({"_id":ObjectId(c_id)})
+    return redirect("/admin/activity")
+
 @home.route("/delete/<email>")
 def delete_one_email(email):
     HMI_CLASS_REG.find_one_and_delete({"employee_email":email})
@@ -296,5 +316,9 @@ def delete_one_email(email):
 
 @home.route("/clear")
 def logout():
+    e = session.get("email")
+    HMI_CLASS_REG.find_one_and_update({"employee_email":e} , {"$set":{
+        "isLogged":False
+    }})
     session.clear()
     return redirect("/")
