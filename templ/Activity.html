@@ -89,7 +89,7 @@
         {%for j in i.replies%}
          <p>You Replied : <b>{{j.content}}</b></p>
          <form action="{{url_for('routes.Delete_Reply' , d_id=i._id)}}" method="POST">
-            {{i._id}}
+           
             <button>Delete Your Reply</button>
          </form>
         {%endfor%}
