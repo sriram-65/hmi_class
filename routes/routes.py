@@ -17,33 +17,38 @@ def HomeLogin():
             phone_no = request.form.get("phone_no")
             
             emp = EMPLOYEE_REGISTER.find_one({"Employee_phone_no":phone_no})
-            hmi = HMI_CLASS_REG.find_one({"employee_email":emp["Employee_email"]})
-            
-            
-            if hmi:
-                return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Already Logged Use Different Phone Number !")
-            
-            data = {
-                "employee_email":emp['Employee_email'],
-                "employes_phone_no":emp["Employee_phone_no"],
-                "role":emp["Employee_Role"],
-                "payment_completed":False,
-                "yes":False,
-                "accept":False,
-                "link":"",
-                "isLogged":True,
-                "status":"pending...."
-            }
-            
-            HMI_CLASS_REG.insert_one(data)
-            
-            session["email"] = emp["Employee_email"]
-            session.permanent = True
-            
-            return redirect("/dash")
+
+            try:
+                hmi = HMI_CLASS_REG.find_one({"employee_email":emp["Employee_email"]})
+                
+                if hmi['isLogged']==True:
+                    return render_template("index.html" , err=f"Employee with This Phone number {phone_no} Already Logged Use Different Phone Number !")
+                else:
+                    session["email"] = emp["Employee_email"]
+                    session.permanent = True
+                    return redirect("/dash")
+            except:
+                data = {
+                    "employee_email":emp['Employee_email'],
+                    "employes_phone_no":emp["Employee_phone_no"],
+                    "role":emp["Employee_Role"],
+                    "payment_completed":False,
+                    "yes":False,
+                    "accept":False,
+                    "link":"",
+                    "isLogged":True,
+                    "status":"pending...."
+                }
+                
+                HMI_CLASS_REG.insert_one(data)
+                
+                session["email"] = emp["Employee_email"]
+                session.permanent = True
+                return redirect("/dash")
         return render_template("index.html")
+    
     except:
-        return render_template("index.html" , err='User Not Found')
+        return render_template("index.html" , err='Internal Server Error')
         
 @home.route("/dash")
 def dashboard():
@@ -316,5 +321,10 @@ def delete_one_email(email):
 
 @home.route("/clear")
 def logout():
+    em = session.get("email")
+    HMI_CLASS_REG.find_one_and_update({"employee_email":em} , {"$set":{
+        "isLogged":False
+    }})
+   
     session.clear()
     return redirect("/")
