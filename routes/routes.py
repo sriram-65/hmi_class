@@ -1,3 +1,4 @@
+#Copy Rights HMI --- Thirulingeshwar and sriram
 from flask import Blueprint , request , render_template , session , redirect , url_for , jsonify
 from database.mongo import EMPLOYEE_REGISTER , HMI_CLASS_REG , COURSES , COMPLETED , NOTES , COMMENTS
 from delroutes.dele import delete_All
@@ -252,6 +253,9 @@ def add_comments(c_id):
     return redirect(url_for('routes.Comments' , c_id=c_id))
 
 
+@home.route("/playground")
+def PlayGround():
+    return render_template("test.html")
 
 @home.route("/admin/activity")
 def activity():
