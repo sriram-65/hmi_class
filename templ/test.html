@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Editor - HMI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<style>
+  body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #1e1e1e;
+    color: white;
+    font-family: sans-serif;
+  }
+  #tabs {
+    display: flex;
+    background-color: #2d2d2d;
+    align-items: center;
+  }
+  .tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #2d2d2d;
+    border-right: 1px solid #444;
+    color: #ccc;
+  }
+  .tab.active {
+    background-color: #1e1e1e;
+    color: white;
+  }
+  #fullscreen-btn {
+    margin-left: auto;
+    padding: 8px 14px;
+    background: #444;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+  #back-btn{
+      padding:10px 10px 10px;
+      margin-left: 20px;
+      background-color: black;
+      color:white;
+      border:none;
+      background: transparent;
+      border:1px solid white;
+      cursor: pointer;
+      outline: none;
+  }
+  #container {
+    flex: 1;
+    display: flex;
+  }
+  #editor {
+    width: 50%;
+    height: 100%;
+    display: none;
+  }
+
+  .loading{
+    width:100%;
+    height: 100vh;
+    position: fixed;
+    top:0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color:black;
+    background-color: white;
+  }
+
+  #preview {
+    width: 50%;
+    height: 100%;
+    border: none;
+    background: white;
+  }
+</style>
+</head>
+<body>
+
+
+    <div class="loading">
+        <div class="load-text">
+
+            <img src="https://media.lordicon.com/icons/wired/flat/745-wifi-connection.gif" alt="Pls Wait" class="img-fluid">
+            <h1 class="text-center" id="s">Connecting To Virtual Server....</h1>
+            <p class="text-muted text-center mt-3">Powered By HMI</p>
+        </div>
+    </div>
+<div id="tabs">
+  <div class="tab active" data-lang="html">HTML</div>
+  <div class="tab" data-lang="css">CSS</div>
+  <div class="tab" data-lang="javascript">JS</div>
+    <small style="margin:auto; font-family: Verdana, Geneva, Tahoma, sans-serif;">Note : Your All Codes are Auto Saved in HMI Cloud</small>
+  <button id="fullscreen-btn">⛶ Fullscreen</button>
+  <button id="back-btn" onclick="history.back()">Back</button>
+
+</div>
+
+<div id="container">
+  <div id="editor"></div>
+  <iframe id="preview"></iframe>
+</div>
+
+<script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
+<script>
+  let currentLang = "html";
+  let codeData = {
+    html: localStorage.getItem("htmlCode") || "<h1>Hello World</h1>",
+    css: localStorage.getItem("cssCode") || "body { font-family: sans-serif; background: lightblue; }",
+    javascript: localStorage.getItem("jsCode") || "console.log('Hello from JS!');"
+  };
+
+  require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@0.44.0/min/vs' }});
+  require(["vs/editor/editor.main"], function () {
+    const editor = monaco.editor.create(document.getElementById('editor'), {
+      value: codeData[currentLang],
+      language: currentLang,
+      theme: 'vs-dark', // you can switch to 'dracula'
+      fontSize: 18,
+      automaticLayout: true
+    });
+
+    function updatePreview() {
+      const fullCode = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>${codeData.css}</style>
+        </head>
+        <body>
+          ${codeData.html}
+          <script>${codeData.javascript}<\/script>
+        </body>
+        </html>`;
+      document.getElementById("preview").srcdoc = fullCode;
+    }
+
+    editor.onDidChangeModelContent(() => {
+      codeData[currentLang] = editor.getValue();
+      localStorage.setItem(currentLang + "Code", editor.getValue());
+      updatePreview();
+    });
+
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelector(".tab.active").classList.remove("active");
+        tab.classList.add("active");
+        currentLang = tab.dataset.lang;
+        editor.setValue(codeData[currentLang]);
+        monaco.editor.setModelLanguage(editor.getModel(), currentLang);
+      });
+    });
+
+    document.getElementById("fullscreen-btn").addEventListener("click", () => {
+      const elem = document.documentElement;
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => {
+          alert(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    updatePreview();
+  });
+
+  setTimeout(()=>{
+    document.getElementById("s").innerHTML = "Choosing Server Region"
+  } , 1500)
+  setTimeout(()=>{
+     document.getElementById("s").innerHTML = "Server Region:Madurai , TN"
+     document.getElementById("s").style.color="green"
+  } , 3400)
+  setTimeout(function(){
+      document.querySelector(".loading").style.display="none"
+      document.getElementById('editor').style.display='block'
+  } , 6000)
+</script>
+
+</body>
+</html>
