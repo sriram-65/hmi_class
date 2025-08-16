@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Code Editor - HMI</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <style>
   body {
     margin: 0;
@@ -14,7 +14,7 @@
     height: 100vh;
     background-color: #1e1e1e;
     color: white;
-    font-family: sans-serif;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
   #tabs {
     display: flex;
@@ -69,8 +69,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color:black;
-    background-color: white;
+    color:rgb(255, 244, 244);
+    background-color: rgb(0, 0, 0);
+  }
+
+  .loading h1{
+    font-size: 60px;
   }
 
   #preview {
@@ -87,7 +91,6 @@
     <div class="loading">
         <div class="load-text">
 
-            <img src="https://media.lordicon.com/icons/wired/flat/745-wifi-connection.gif" alt="Pls Wait" class="img-fluid">
             <h1 class="text-center" id="s">Connecting To Virtual Server....</h1>
             <p class="text-muted text-center mt-3">Powered By HMI</p>
         </div>
@@ -96,7 +99,10 @@
   <div class="tab active" data-lang="html">HTML</div>
   <div class="tab" data-lang="css">CSS</div>
   <div class="tab" data-lang="javascript">JS</div>
+
     <small style="margin:auto; font-family: Verdana, Geneva, Tahoma, sans-serif;">Note : Your All Codes are Auto Saved in HMI Cloud</small>
+
+  <button class="btn btn-danger" id="publish">Publish Your Website</button>
   <button id="fullscreen-btn">⛶ Fullscreen</button>
   <button id="back-btn" onclick="history.back()">Back</button>
 
@@ -106,7 +112,7 @@
   <div id="editor"></div>
   <iframe id="preview"></iframe>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
 <script>
   let currentLang = "html";
@@ -115,13 +121,14 @@
     css: localStorage.getItem("cssCode") || "body { font-family: sans-serif; background: lightblue; }",
     javascript: localStorage.getItem("jsCode") || "console.log('Hello from JS!');"
   };
+  
 
   require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@0.44.0/min/vs' }});
   require(["vs/editor/editor.main"], function () {
     const editor = monaco.editor.create(document.getElementById('editor'), {
       value: codeData[currentLang],
       language: currentLang,
-      theme: 'vs-dark', // you can switch to 'dracula'
+      theme: 'vs-dark', 
       fontSize: 18,
       automaticLayout: true
     });
@@ -175,13 +182,56 @@
     document.getElementById("s").innerHTML = "Choosing Server Region"
   } , 1500)
   setTimeout(()=>{
-     document.getElementById("s").innerHTML = "Server Region:Madurai , TN"
-     document.getElementById("s").style.color="green"
+     document.getElementById("s").innerHTML = "Server Region : Madurai , TN"
+     document.getElementById("s").style.color="#29f700"
   } , 3400)
   setTimeout(function(){
       document.querySelector(".loading").style.display="none"
       document.getElementById('editor').style.display='block'
   } , 6000)
+
+
+  let pub = document.getElementById("publish")
+  pub.onclick = function(){
+     let a = localStorage.getItem("htmlCode") +`<style> ${localStorage.getItem("cssCode")} </style>`+`<script> ${localStorage.getItem("javascriptCode")} <\/script>`
+    Swal.fire({
+  title: "Are you sure?",
+  text: "Want To Publish Your Webiste Fully?",
+  icon: "question",
+  showCancelButton: true,
+  confirmButtonColor: "#3085d6",
+  cancelButtonColor: "#d33",
+  confirmButtonText: "Yes"
+}).then((result) => {
+  if (result.isConfirmed) {
+    
+    let formdata = new FormData()
+    formdata.append("code" , a)
+    Swal.fire("Publishing Your Website...");
+    fetch("/publish/user/code" , {
+      method:"POST",
+      body:formdata
+    }).then(res=>res.json()).then(data=>{
+         if(data.link){
+                 Swal.fire({
+      title: "Your Website Fully Published...",
+      html:  `<a href=${data.link} target="_blank">Visit Your Site</a> <br>`,
+      icon: "success"
+    });
+         }
+         
+    }).catch(e=>{
+      Swal.fire({
+  title: "Something Went Wrong",
+  text: "There was an Error While Processing Your Request Pls Try Again Later or Contact Site Owner",
+  icon: "question"
+});
+    })
+
+    
+  }
+});
+  }
 </script>
 
 </body>
