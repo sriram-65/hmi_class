@@ -1,6 +1,6 @@
-#Copy Rights HMI --- Thirulingeshwar and sriram
+#HMI_CLASS 
 from flask import Blueprint , request , render_template , session , redirect , url_for , jsonify
-from database.mongo import EMPLOYEE_REGISTER , HMI_CLASS_REG , COURSES , COMPLETED , NOTES , COMMENTS
+from database.mongo import EMPLOYEE_REGISTER , HMI_CLASS_REG , COURSES , COMPLETED , NOTES , COMMENTS , PUBLISH
 from delroutes.dele import delete_All
 from cloud.cloudi import upload_notes
 from bson.objectid import ObjectId
@@ -257,6 +257,36 @@ def add_comments(c_id):
 def PlayGround():
     return render_template("test.html")
 
+
+@home.route("/publish/user/code" , methods=["POST"])
+def pusblish_website():
+    try:
+        code = request.form.get("code")
+        email = session.get("email")
+        
+        data = {
+            "user":email,
+            "code":code,
+        }
+      
+        p_id = PUBLISH.insert_one(data)
+        link = url_for("routes.Hmi_Publish" ,publish_id=p_id.inserted_id , _external=True)
+        return jsonify({"Sucess":True , "link":link})
+    
+    except Exception as e:
+        return jsonify({"Sucess":False , "error":e})
+
+
+@home.route("/hmi/publish/<publish_id>")
+def Hmi_Publish(publish_id):
+    try:
+        website = PUBLISH.find_one({"_id":ObjectId(publish_id)})
+        return render_template("liveWeb.html" , wesite = website)
+    except:
+        return render_template("pagenotfound.html")
+
+
+
 @home.route("/admin/activity")
 def activity():
     c = COMMENTS.find({}).sort("_id" , -1)
@@ -267,7 +297,6 @@ def activity():
 def delete():
     delete_All()
     return jsonify({"suess":"deleted Suessfully"})
-
 
 @home.route("/reply/<c_id>" , methods=["POST"])
 def Rep_Comment(c_id):
@@ -323,6 +352,42 @@ def delete_one_email(email):
     return jsonify("Suess...")
 
 
+@home.route("/send-mail")
+def send_mail():
+    email = session.get("email")
+    if email:
+        return jsonify({"Sucess":True,"user_email":email})
+    else:
+        return jsonify({"Sucess":False , "error":"User is Not Authenticated"})
+
+@home.route('/edit/<course_id>' , methods=["POST" , "GET"])
+def Edit_course(course_id):
+    try:
+        if request.method == "POST":
+            title = request.form.get("title")
+            des = request.form.get("des")
+            code = request.form.get("code")
+            for_which = request.form.get("for_which")
+
+            COURSES.find_one_and_update({"_id":ObjectId(course_id)} , {"$set":{
+                "title":title,
+                "des":des,
+                "video_link":code,
+                "for_which":for_which
+            }})
+
+            return redirect("/admin/activity")
+        
+        courses = COURSES.find_one({"_id":ObjectId(course_id)})
+        if courses:
+          return render_template("editcourse.html" , c=courses)
+        else:
+            return "<h1> Course Not Found </h1> <br> <b> Pls Check Again if any mistake </b>"
+
+    except:
+        return "Internal Server Error"
+
+
 @home.route("/clear")
 def logout():
     em = session.get("email")
@@ -332,3 +397,4 @@ def logout():
    
     session.clear()
     return redirect("/")
+
