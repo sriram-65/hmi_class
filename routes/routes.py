@@ -107,7 +107,8 @@ def Get_data():
 def get_datas(email):
     data = HMI_CLASS_REG.find_one({"employee_email":email})
     photo = EMPLOYEE_REGISTER.find_one({"Employee_email":email})
-    return render_template("settings.html" , data=data , photo=photo['Employee_Pic'])
+    p = PUBLISH.find({"user":email}).sort("_id" , -1).limit(1)
+    return render_template("settings.html" , data=data , photo=photo['Employee_Pic'] , p=p)
 
 
 @home.route("/hmi-class/home")
@@ -122,7 +123,10 @@ def UploadCourse(name):
     elif name == "Developer":
         return redirect("/developer")
     
-            
+@home.route("/delete/pub")
+def delete_pub():
+    PUBLISH.delete_many({})
+    return "deleted...."            
 
 @home.route("/ClientEmployee" , methods=["POST" , "GET"])
 def Clinet_Employee():
@@ -166,6 +170,17 @@ def upload_developer():
     return render_template("upload_dev.html")
 
 
+@home.route("/check/website/<name>")
+def check_name(name):
+    p_name = PUBLISH.find_one({"project_name":name})
+
+    if p_name:
+        return jsonify({"Sucess":False , "data":"Name Exits"})
+    else:
+        return jsonify({"Sucess":True})
+
+
+    
 @home.route("/send-complete" , methods=["POST"])
 def send_completed():
     email = session.get("email")
