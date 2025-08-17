@@ -72,7 +72,6 @@
     color:rgb(255, 244, 244);
     background-color: rgb(0, 0, 0);
   }
-
   .loading h1{
     font-size: 60px;
   }
@@ -122,7 +121,6 @@
     javascript: localStorage.getItem("jsCode") || "console.log('Hello from JS!');"
   };
   
-
   require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@0.44.0/min/vs' }});
   require(["vs/editor/editor.main"], function () {
     const editor = monaco.editor.create(document.getElementById('editor'), {
