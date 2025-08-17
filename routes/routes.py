@@ -1,4 +1,4 @@
-#HMI_CLASS 
+
 from flask import Blueprint , request , render_template , session , redirect , url_for , jsonify
 from database.mongo import EMPLOYEE_REGISTER , HMI_CLASS_REG , COURSES , COMPLETED , NOTES , COMMENTS , PUBLISH
 from delroutes.dele import delete_All
@@ -278,14 +278,21 @@ def pusblish_website():
     try:
         code = request.form.get("code")
         email = session.get("email")
+        p_name = request.form.get("p_name")
         
+
         data = {
             "user":email,
+            "project_name":p_name,
             "code":code,
+            "link":""
         }
       
         p_id = PUBLISH.insert_one(data)
         link = url_for("routes.Hmi_Publish" ,publish_id=p_id.inserted_id , _external=True)
+        PUBLISH.find_one_and_update({"_id":ObjectId(p_id.inserted_id)} , {"$set":{
+            "link":link
+        }})
         return jsonify({"Sucess":True , "link":link})
     
     except Exception as e:
@@ -371,7 +378,10 @@ def delete_one_email(email):
 def send_mail():
     email = session.get("email")
     if email:
+        session['email'] = email
+        session.permanent = True
         return jsonify({"Sucess":True,"user_email":email})
+        
     else:
         return jsonify({"Sucess":False , "error":"User is Not Authenticated"})
 
