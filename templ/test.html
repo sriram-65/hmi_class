@@ -72,6 +72,25 @@
     color:rgb(255, 244, 244);
     background-color: rgb(0, 0, 0);
   }
+  .project-name{
+   
+    padding: 20px 20px 20px;
+    border-radius: 10px;
+    background-color: #5c5c5c;
+    color:rgb(0, 0, 0);
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50% , -50%);
+    z-index: 100;
+    display: none;
+  }
+
+  .project-name input{
+    padding:10px 10px 10px;
+    border:1px solid #ccc;
+    outline: black;
+  }
   .loading h1{
     font-size: 60px;
   }
@@ -107,10 +126,16 @@
 
 </div>
 
+<div class="project-name">
+<input type="text" id="namebox"  name="p_name" placeholder="Enter Project Name">
+<button id="apply" class="btn btn-dark">Apply</button>
+</div>
 <div id="container">
   <div id="editor"></div>
   <iframe id="preview"></iframe>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
 <script>
@@ -176,61 +201,107 @@
     updatePreview();
   });
 
+ let cytics = ["Thiruparankundram" , "Mattuthavani" , "Vilachery"]
   setTimeout(()=>{
     document.getElementById("s").innerHTML = "Choosing Server Region"
   } , 1500)
   setTimeout(()=>{
-     document.getElementById("s").innerHTML = "Server Region : Madurai , TN"
+     document.getElementById("s").innerHTML = "Server Region : Madurai  , " + cytics[Math.floor(Math.random()*cytics.length)]
      document.getElementById("s").style.color="#29f700"
   } , 3400)
   setTimeout(function(){
       document.querySelector(".loading").style.display="none"
       document.getElementById('editor').style.display='block'
-  } , 6000)
+  } , 6600)   
+
+
+  let project_name = document.querySelector(".project-name")
+  let namebox = document.getElementById("namebox")
+  let apply = document.getElementById("apply")
+
+  function showProjectName(){
+  return new Promise((resolve) => {
+    project_name.style.display = "block";
+
+    apply.onclick = function(){
+      apply.disabled = true;
+      fetch(`/check/website/${namebox.value}`)
+        .then(res=>res.json())
+        .then(data=>{
+          apply.disabled = false;
+          if(data.Sucess === true){
+            
+            Swal.fire("Project name is available ✅", "", "success");
+            resolve(true);
+          } else {
+
+            Swal.fire("Project name already exists ❌", "Try another name.", "error");
+            resolve(false);
+          }
+        })
+        .catch(e=>{
+          console.log(e);
+          Swal.fire("Error checking project name", "Please try again later", "error");
+          resolve(false);
+        });
+    }
+  });
+}
+
 
 
   let pub = document.getElementById("publish")
-  pub.onclick = function(){
-     let a = localStorage.getItem("htmlCode") +`<style> ${localStorage.getItem("cssCode")} </style>`+`<script> ${localStorage.getItem("javascriptCode")} <\/script>`
-    Swal.fire({
-  title: "Are you sure?",
-  text: "Want To Publish Your Webiste Fully?",
-  icon: "question",
-  showCancelButton: true,
-  confirmButtonColor: "#3085d6",
-  cancelButtonColor: "#d33",
-  confirmButtonText: "Yes"
-}).then((result) => {
-  if (result.isConfirmed) {
-    
-    let formdata = new FormData()
-    formdata.append("code" , a)
-    Swal.fire("Publishing Your Website...");
-    fetch("/publish/user/code" , {
-      method:"POST",
-      body:formdata
-    }).then(res=>res.json()).then(data=>{
-         if(data.link){
-                 Swal.fire({
-      title: "Your Website Fully Published...",
-      html:  `<a href=${data.link} target="_blank">Visit Your Site</a> <br>`,
-      icon: "success"
-    });
-         }
-         
-    }).catch(e=>{
-      Swal.fire({
-  title: "Something Went Wrong",
-  text: "There was an Error While Processing Your Request Pls Try Again Later or Contact Site Owner",
-  icon: "question"
-});
-    })
+  pub.onclick = async function(){
+    let a = localStorage.getItem("htmlCode") +
+            `<style>${localStorage.getItem("cssCode")}</style>` +
+            `<script>${localStorage.getItem("jsCode")}<\/script>`;
 
-    
-  }
-});
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Want To Publish Your Website Fully?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes"
+    });
+
+    if (result.isConfirmed) {
+      let final = await showProjectName();
+      if(final){
+        let formdata = new FormData();
+        formdata.append("code", a);
+        formdata.append("p_name", document.getElementById("namebox").value);
+
+        Swal.fire("Publishing Your Website...");
+        fetch("/publish/user/code", {
+          method: "POST",
+          body: formdata
+        })
+        .then(res=>res.json())
+        .then(data=>{
+          if(data.link){
+            Swal.fire({
+              title: "Your Website Fully Published...",
+              html: `<a href=${data.link} target="_blank">Visit Your Site</a>`,
+              icon: "success"
+            });
+
+            document.querySelector(".project-name").style.display = "none"
+          }
+        })
+        .catch(e=>{
+          Swal.fire({
+            title: "Something Went Wrong",
+            text: "Error while publishing. Try again later.",
+            icon: "error"
+          });
+        })
+      }
+    }
   }
 </script>
+
 
 </body>
 </html>
