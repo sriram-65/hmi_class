@@ -4,61 +4,296 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - {{data["employee_email"]}}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --danger: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --card-bg: #ffffff;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            background: #f0f2f5;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
         }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            margin-top: 30px;
+        }
+        
         .profile-card {
-            background: #ffffff;
+            background: var(--card-bg);
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
             text-align: center;
-            width: 300px;
+            width: 320px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
         .profile-card img {
             border-radius: 50%;
-            margin-bottom: 15px;
-            border: 3px solid #4CAF50;
+            margin-bottom: 20px;
+            border: 5px solid rgba(67, 97, 238, 0.2);
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
         }
+        
+        .profile-card:hover img {
+            transform: scale(1.05);
+        }
+        
         .profile-card h2 {
             margin: 10px 0 5px;
-            color: #333;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1.4rem;
         }
-        .profile-card p {
-            color: #666;
-            font-size: 14px;
-            margin: 5px 0;
+        
+        .profile-card .info-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 12px 0;
+            color: #555;
+            font-size: 0.95rem;
         }
+        
+        .profile-card .info-item strong {
+            margin-right: 8px;
+            color: var(--dark);
+            min-width: 70px;
+            text-align: right;
+        }
+        
         .logout-btn {
             display: inline-block;
-            margin-top: 15px;
-            padding: 8px 20px;
-            background-color: #ff4d4d;
+            margin-top: 20px;
+            padding: 10px 25px;
+            background-color: var(--danger);
             color: white;
             text-decoration: none;
-            border-radius: 8px;
-            transition: background 0.3s;
+            border-radius: 50px;
+            transition: all 0.3s;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(247, 37, 133, 0.3);
         }
+        
         .logout-btn:hover {
-            background-color: #e60000;
+            background-color: #d91a6d;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(247, 37, 133, 0.4);
+        }
+        
+        .projects-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            width: 600px;
+            transition: transform 0.3s;
+        }
+        
+        .projects-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .projects-card h2 {
+            color: var(--dark);
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .projects-card h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
+        .projects-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 20px;
+        }
+        
+        .projects-table thead th {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .projects-table thead th:first-child {
+            border-top-left-radius: 10px;
+        }
+        
+        .projects-table thead th:last-child {
+            border-top-right-radius: 10px;
+        }
+        
+        .projects-table tbody tr {
+            transition: background 0.2s;
+        }
+        
+        .projects-table tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .projects-table tbody td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+        
+        .projects-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .projects-table tbody td:first-child {
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .projects-table tbody td a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .projects-table tbody td a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+        
+        .community-note {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e2e8f0 100%);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--accent);
+            max-width: 600px;
+        }
+        
+        .community-note p {
+            margin: 0;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        
+        .community-note a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .community-note a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .profile-card, .projects-card {
+                width: 90%;
+            }
         }
     </style>
 </head>
 <body>
-  
+    <div class="container">
+        <div class="profile-card">
+            <img src="{{photo}}" alt="Profile Image" />
+            <h2>{{data["employee_email"]}}</h2>
+            
+            <div class="info-item">
+                <strong>Role:</strong>
+                <span>{{data["role"]}}</span>
+            </div>
+            
+            <div class="info-item">
+                <strong>Phone:</strong>
+                <span>{{data["employes_phone_no"]}}</span>
+            </div>
+            
+            <a class="logout-btn" href="/clear">Logout</a>
+        </div>
+        
+        <div class="projects-card">
+            <h2>Your Projects</h2>
+            <table class="projects-table">
+                <thead>
+                    <tr>
+                        <th>Project Name</th>
+                        <th>Links</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for i in p%}
+                    <tr>
+                        <td>{{i.project_name}}</td>
+                        <td><a href="{{i.link}}" target="_blank">View Project</a></td>
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+        </div>
+    </div>
     
-    <div class="profile-card">
-        <img src="{{photo}}" alt="Profile Image" width="280" height="260" />
-        <h2>Email : {{data["employee_email"]}}</h2>
-        <p><strong>Role:</strong> {{data["role"]}}</p>
-        <p><strong>Phone:</strong> {{data["employes_phone_no"]}}</p>
-        <a class="logout-btn" href="/clear">Logout</a>
+    <div class="community-note">
+        <p>If You Want To See more Projects then please visit our <a href="#">HMI Community</a>!</p>
     </div>
 </body>
 </html>
