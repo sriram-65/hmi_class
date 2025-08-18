@@ -143,7 +143,7 @@
   let codeData = {
     html: localStorage.getItem("htmlCode") || "<h1>Hello World</h1>",
     css: localStorage.getItem("cssCode") || "body { font-family: sans-serif; background: lightblue; }",
-    javascript: localStorage.getItem("jsCode") || "console.log('Hello from JS!');"
+    javascript: localStorage.getItem("javascriptCode")
   };
   
   require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@0.44.0/min/vs' }});
@@ -254,7 +254,7 @@
   pub.onclick = async function(){
     let a = localStorage.getItem("htmlCode") +
             `<style>${localStorage.getItem("cssCode")}</style>` +
-            `<script>${localStorage.getItem("jsCode")}<\/script>`;
+            `<script>${localStorage.getItem("javascriptCode")}<\/script>`;
 
     const result = await Swal.fire({
       title: "Are you sure?",
